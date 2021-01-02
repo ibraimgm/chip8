@@ -1,5 +1,3 @@
-run:
-  modules-download-mode: readonly
 
 linters-settings:
   errcheck:
@@ -8,9 +6,15 @@ linters-settings:
     locale: US
   unused:
     check-exported: false
+  maligned:
+    suggest-new: true
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - performance
+      - opinionated
   goimports:
     local-prefixes: github.com/ibraimgm/chip8
-
 
 linters:
   fast: true
@@ -22,7 +26,7 @@ linters:
     - gochecknoinits
     - gocognit
     - gocritic
-    # - godot (currently, there is no way to pass -C to this linter)
+    # - godot (currently, there is no way to ignore comments on private vars)
     - goerr113
     - goimports
     - golint
@@ -48,7 +52,7 @@ issues:
     # ignore some linters on test code
     - path: _test\.go
       linters:
-        - gocyclo
+        - gocognit
         - funlen
 
     # goimports: We should care only when changing files
