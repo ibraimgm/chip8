@@ -5,12 +5,15 @@ import (
 	"io"
 )
 
+// Common addresses used by the CHIP-8 emulator.
 const (
 	AddrVideo  = 0x000
 	AddrSprite = 0x100
 	AddrStart  = 0x200
 )
 
+// ErrLoadOverflow is the error returned when the emulator tries to
+// load a image that is bigger than the maximum available memory.
 var ErrLoadOverflow = errors.New("error loading ROM: size exceeds CHIP-8 memory limit")
 
 // static sprite data
@@ -33,6 +36,8 @@ var sprites = [80]byte{
 	0xF0, 0x80, 0xF0, 0x80, 0x80, // F
 }
 
+// Reset resets the emulator state. This clears all memory and
+// resets all registers to the initial values.
 func (c *Emulator) Reset() {
 	// clear memory
 	for i := 0; i < len(c.Memory); i++ {
@@ -60,6 +65,9 @@ func (c *Emulator) Reset() {
 	c.PC = AddrStart
 }
 
+// LoadROM loads a given ROM to the emulator memory. Before
+// loading, Reset is called to keep the emulator in a 'clean'
+// state.
 func (c *Emulator) LoadROM(rom io.Reader) error {
 	c.Reset()
 
