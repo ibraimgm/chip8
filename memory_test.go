@@ -2,6 +2,7 @@ package chip8_test
 
 import (
 	"bytes"
+	"errors"
 	"math/rand"
 	"testing"
 
@@ -143,7 +144,7 @@ func TestLoadBigROM(t *testing.T) {
 		t.Fatal("should have returned error, but got none")
 	}
 
-	if err != chip8.ErrLoadOverflow {
+	if errors.Is(err, chip8.ErrLoadOverflow) {
 		t.Fatalf("expected ROM overflow error, but got '%v'", chip8.ErrLoadOverflow)
 	}
 
