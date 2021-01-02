@@ -2,6 +2,7 @@
 
 A golang CHIP-8 emulator. Still in early development.
 
+![CI](https://github.com/ibraimgm/chip8/workflows/CI/badge.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ibraimgm/chip8)](https://goreportcard.com/report/github.com/ibraimgm/chip8)
 [![codecov](https://codecov.io/gh/ibraimgm/chip8/branch/master/graph/badge.svg?token=ZI6CQLXEOI)](https://codecov.io/gh/ibraimgm/chip8)
 
