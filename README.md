@@ -1,5 +1,11 @@
 # Chip8
 
+<p align="center">
+  <img alt="Logo" src="logo.png" />
+  <br />
+  <br />
+</p>
+
 A golang CHIP-8 emulator. Still in early development.
 
 ![CI](https://github.com/ibraimgm/chip8/workflows/CI/badge.svg)
