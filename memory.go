@@ -16,6 +16,14 @@ const (
 // load a image that is bigger than the maximum available memory.
 var ErrLoadOverflow = errors.New("error loading ROM: size exceeds CHIP-8 memory limit")
 
+// ErrInvalidAddress is returned when a jump or similar command tries to
+// go to an invalid address.
+var ErrInvalidAddress = errors.New("invalid memory address")
+
+// ErrMemWrite is returned by the emulator when an instruction tries to
+// write to the reserved memory of the emulator.
+var ErrMemWrite = errors.New("cannot write into reserved memory address")
+
 // static sprite data
 var sprites = [80]byte{
 	0xF0, 0x90, 0x90, 0x90, 0xF0, // 0

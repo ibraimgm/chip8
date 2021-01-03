@@ -36,6 +36,7 @@ linters:
     - maligned
     - misspell
     - nakedret
+    - nolintlint
     - rowserrcheck
     - scopelint
     - scopelint
@@ -52,8 +53,10 @@ issues:
     # ignore some linters on test code
     - path: _test\.go
       linters:
-        - gocognit
         - funlen
+        - gocognit
+        - maligned
+
 
     # goimports: We should care only when changing files
     - text: File is not `goimports`-ed
