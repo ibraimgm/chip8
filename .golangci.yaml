@@ -12,7 +12,6 @@ linters-settings:
     enabled-tags:
       - diagnostic
       - performance
-      - opinionated
   goimports:
     local-prefixes: github.com/ibraimgm/chip8
 
