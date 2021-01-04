@@ -38,8 +38,6 @@ func runEmulator(rom []byte, videoImage ...byte) (*chip8.Emulator, error) {
 }
 
 func TestOpSys(t *testing.T) {
-	t.SkipNow()
-
 	c, err := runEmulator([]byte{0x01, 0x23, 0x00, 0xE1, 0x00, 0xEA})
 	if err != nil {
 		t.Fatal(err)
@@ -74,8 +72,6 @@ func TestOpSys(t *testing.T) {
 }
 
 func TestOpCls(t *testing.T) {
-	t.SkipNow()
-
 	demoImage := []byte{
 		0b00000000, 0b00000000, 0b00000001, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, // _______________________#________________________________________
 		0b00100000, 0b00000100, 0b00000011, 0b10000000, 0b00011111, 0b11000000, 0b00000000, 0b00000011, // __#__________#________###__________#######____________________##
@@ -119,14 +115,12 @@ func TestOpCls(t *testing.T) {
 	// video should be cleared
 	for i := chip8.AddrVideo; i < 256; i++ {
 		if c.Memory[i] != 0 {
-			t.Fatalf("video memory at address 0x%X should be zero, but was 0x%02X", i, c.Memory[i])
+			t.Fatalf("video memory at address 0x%02X should be zero, but was 0x%02X", i, c.Memory[i])
 		}
 	}
 }
 
 func TestOpLdValue(t *testing.T) {
-	t.SkipNow()
-
 	tests := []byte{2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32}
 	rom := make([]byte, 0, len(tests)*2)
 
@@ -147,8 +141,6 @@ func TestOpLdValue(t *testing.T) {
 }
 
 func TestOpLdVx(t *testing.T) {
-	t.SkipNow()
-
 	const registers = 16
 
 	for y := byte(0); y < registers; y++ {
