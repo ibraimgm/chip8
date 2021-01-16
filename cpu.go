@@ -32,13 +32,13 @@ var handlers = [16]func(*Emulator, byte, byte) error{
 	handleOp0,
 	handleOp1,
 	handleOp2,
-	nil,
-	nil,
-	nil,
+	handleOp34,
+	handleOp34,
+	handleOp59,
 	handleOp6,
 	nil,
 	handleOp8,
-	nil,
+	handleOp59,
 	nil,
 	handleOpB,
 	nil,
@@ -102,6 +102,31 @@ func handleOp2(c *Emulator, a byte, b byte) error {
 	c.SP++
 
 	c.PC = (uint16(a&lsnMask) << 8) + uint16(b)
+	return nil
+}
+
+func handleOp34(c *Emulator, a byte, b byte) error {
+	x := int(a & lsnMask)
+
+	if (c.V[x] == b) == (a&msnMask>>4 == 3) {
+		c.PC += 2
+	}
+
+	return nil
+}
+
+func handleOp59(c *Emulator, a byte, b byte) error {
+	if (b & lsnMask) != 0 {
+		return NoOpError{A: a, B: b}
+	}
+
+	x := int(a & lsnMask)
+	y := ((b & msnMask) >> 4)
+
+	if (c.V[x] == c.V[y]) == (a&msnMask>>4 == 5) {
+		c.PC += 2
+	}
+
 	return nil
 }
 
