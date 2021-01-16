@@ -31,7 +31,7 @@ func (e NoOpError) Error() string {
 var handlers = [16]func(*Emulator, byte, byte) error{
 	handleOp0,
 	handleOp1,
-	nil,
+	handleOp2,
 	nil,
 	nil,
 	nil,
@@ -71,10 +71,17 @@ func (c *Emulator) Execute(cycles int) (int, error) {
 }
 
 func handleOp0(c *Emulator, a byte, b byte) error {
-	if a == 0x00 && b == 0xE0 {
+	switch {
+	// clear screen
+	case a == 0x00 && b == 0xE0:
 		for i := 0; i < 256; i++ {
 			c.Memory[AddrVideo+i] = 0
 		}
+
+	// RET (ignores if there is nothing on the stack)
+	case a == 0x00 && b == 0xEE && c.SP > 0:
+		c.SP--
+		c.PC = c.Stack[int(c.SP)]
 	}
 
 	return nil
@@ -82,6 +89,18 @@ func handleOp0(c *Emulator, a byte, b byte) error {
 
 func handleOp1(c *Emulator, a byte, b byte) error {
 	// no need to error check; max value is 4095 which is still in range
+	c.PC = (uint16(a&lsnMask) << 8) + uint16(b)
+	return nil
+}
+
+func handleOp2(c *Emulator, a byte, b byte) error {
+	if int(c.SP) >= len(c.Stack) {
+		return ErrStackOverflow
+	}
+
+	c.Stack[c.SP] = c.PC
+	c.SP++
+
 	c.PC = (uint16(a&lsnMask) << 8) + uint16(b)
 	return nil
 }

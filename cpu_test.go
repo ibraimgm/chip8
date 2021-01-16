@@ -218,8 +218,6 @@ func TestOpJP(t *testing.T) {
 }
 
 func TestOpCallRet(t *testing.T) {
-	t.SkipNow()
-
 	rom := []byte{
 		0x12, 0x08, // JP 0x208 (skip the next 3 lines)
 		0x61, 0x01, // V1 = 1
@@ -244,8 +242,6 @@ func TestOpCallRet(t *testing.T) {
 }
 
 func TestStackOverflow(t *testing.T) {
-	t.SkipNow()
-
 	_, err := runEmulator([]byte{0x22, 0x00}) // call self (inf. loop)
 	if !errors.Is(err, chip8.ErrStackOverflow) {
 		t.Fatalf("expected stack overflow error, but got %v", err)
