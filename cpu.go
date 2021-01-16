@@ -36,7 +36,7 @@ var handlers = [16]func(*Emulator, byte, byte) error{
 	handleOp34,
 	handleOp59,
 	handleOp6,
-	nil,
+	handleOp7,
 	handleOp8,
 	handleOp59,
 	nil,
@@ -135,17 +135,42 @@ func handleOp6(c *Emulator, a byte, b byte) error {
 	return nil
 }
 
+func handleOp7(c *Emulator, a byte, b byte) error {
+	c.V[a&lsnMask] += b
+	return nil
+}
+
 func handleOp8(c *Emulator, a byte, b byte) error {
 	x := a & lsnMask
 	y := b & msnMask >> 4
 	n := b & lsnMask
 
-	if n == 0 {
+	switch n {
+	case 0:
 		c.V[x] = c.V[y]
-		return nil
+	case 4:
+		v := uint16(c.V[x]) + uint16(c.V[y])
+		c.V[x] = byte(v & 0x00FF)
+		c.V[0xF] = byte(v >> 8)
+	case 5:
+		if c.V[x] > c.V[y] {
+			c.V[0xF] = 1
+		} else {
+			c.V[0xF] = 0
+		}
+		c.V[x] -= c.V[y]
+	case 7:
+		if c.V[y] > c.V[x] {
+			c.V[0xF] = 1
+		} else {
+			c.V[0xF] = 0
+		}
+		c.V[x] = c.V[y] - c.V[x]
+	default:
+		return NoOpError{A: a, B: b}
 	}
 
-	return NoOpError{A: a, B: b}
+	return nil
 }
 
 func handleOpB(c *Emulator, a byte, b byte) error {

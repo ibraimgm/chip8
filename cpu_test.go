@@ -280,8 +280,6 @@ func TestOpSkips(t *testing.T) {
 }
 
 func TestOpMath(t *testing.T) {
-	t.SkipNow()
-
 	rom := []byte{
 		0x60, 0x03, // V0 = 3
 		0x61, 0x04, // V1 = 4
@@ -291,7 +289,7 @@ func TestOpMath(t *testing.T) {
 		0x72, 0x05, // V2 = V2 + 5
 		0x83, 0x04, // V3 = V3 + V0
 		0x81, 0xA5, // V1 = V1 - VA
-		0x41, 0x00, // SNE V1,0
+		0x31, 0x00, // SE V1,0
 		0x12, 0x0A, // JP 0x20A
 	}
 
@@ -308,18 +306,16 @@ func TestOpMath(t *testing.T) {
 }
 
 func TestOpMathCarry(t *testing.T) {
-	t.SkipNow()
-
 	rom := []byte{
-		0x60, 0x05, // V0 = 5
-		0x61, 0x05, // V1 = 6
+		0x60, 0x04, // V0 = 4
+		0x61, 0x05, // V1 = 5
 		0x62, 0x0A, // V2 = 10
 		0x80, 0x25, // V0 = V0 - V2 (SUB)
-		0x4F, 0x00, // SNE VF,0
+		0x3F, 0x00, // SE VF,0
 		0x63, 0x01, // V3 = 1 (skipped)
 		0x81, 0x27, // V1 = V2 - V1 (SUBN)
-		0x4F, 0x00, // SNE VF,1
-		0x63, 0x01, // V4 = 1 (skipped)
+		0x4F, 0x00, // SNE VF,0
+		0x64, 0x01, // V4 = 1 (skipped)
 	}
 
 	c, err := runEmulator(rom)
@@ -327,7 +323,7 @@ func TestOpMathCarry(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	for i, v := range []byte{250, 4, 10, 0, 0} {
+	for i, v := range []byte{250, 5, 10, 0, 0} {
 		if c.V[i] != v {
 			t.Fatalf("expected register V%X to have value 0x%02X but found 0x%02X", i, v, c.V[i])
 		}
