@@ -1,6 +1,8 @@
 package chip8
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // masks to extract the most/least nibbles
 const (
@@ -28,7 +30,7 @@ func (e NoOpError) Error() string {
 // handlers for each 'category' of instruction
 var handlers = [16]func(*Emulator, byte, byte) error{
 	handleOp0,
-	nil,
+	handleOp1,
 	nil,
 	nil,
 	nil,
@@ -38,7 +40,7 @@ var handlers = [16]func(*Emulator, byte, byte) error{
 	handleOp8,
 	nil,
 	nil,
-	nil,
+	handleOpB,
 	nil,
 	nil,
 	nil,
@@ -78,6 +80,12 @@ func handleOp0(c *Emulator, a byte, b byte) error {
 	return nil
 }
 
+func handleOp1(c *Emulator, a byte, b byte) error {
+	// no need to error check; max value is 4095 which is still in range
+	c.PC = (uint16(a&lsnMask) << 8) + uint16(b)
+	return nil
+}
+
 func handleOp6(c *Emulator, a byte, b byte) error {
 	c.V[a&lsnMask] = b
 	return nil
@@ -94,4 +102,14 @@ func handleOp8(c *Emulator, a byte, b byte) error {
 	}
 
 	return NoOpError{A: a, B: b}
+}
+
+func handleOpB(c *Emulator, a byte, b byte) error {
+	addr := (uint16(a&lsnMask) << 8) + uint16(b) + uint16(c.V[0])
+	if int(addr) >= len(c.Memory) {
+		return ErrInvalidAddress
+	}
+
+	c.PC = addr
+	return nil
 }

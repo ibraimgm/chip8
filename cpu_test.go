@@ -175,8 +175,6 @@ func TestOpLdVx(t *testing.T) {
 }
 
 func TestOpJP(t *testing.T) {
-	t.SkipNow()
-
 	tests := []struct {
 		name  string
 		rom   []byte
@@ -184,8 +182,7 @@ func TestOpJP(t *testing.T) {
 		isErr bool
 	}{
 		{name: "JP", rom: []byte{0x60, 0x01, 0x12, 0x06, 0x61, 0x01, 0x62, 0x01}, vx: []byte{1, 0, 1}},
-		{name: "JP Error", rom: []byte{0x1F, 0xFF}, isErr: true},
-		{name: "JP+", rom: []byte{0x60, 0x04, 0xB2, 0x02, 0x61, 0x01, 0x61, 0x01}, vx: []byte{1, 0, 1}},
+		{name: "JP+", rom: []byte{0x60, 0x04, 0xB2, 0x02, 0x61, 0x01, 0x62, 0x01}, vx: []byte{4, 0, 1}},
 		{name: "JP+ Error", rom: []byte{0x60, 0xAA, 0xBF, 0xF0, 0x61, 0x01, 0x61, 0x01}, isErr: true},
 	}
 
