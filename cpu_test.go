@@ -355,8 +355,6 @@ func TestOpLogic(t *testing.T) {
 }
 
 func TestOpShift(t *testing.T) {
-	t.SkipNow()
-
 	tests := []struct {
 		name string
 		rom  []byte

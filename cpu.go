@@ -165,6 +165,9 @@ func handleOp8(c *Emulator, a byte, b byte) error {
 			c.V[0xF] = 0
 		}
 		c.V[x] -= c.V[y]
+	case 6:
+		c.V[0xF] = c.V[y] & 0b00000001
+		c.V[x] = c.V[y] >> 1
 	case 7:
 		if c.V[y] > c.V[x] {
 			c.V[0xF] = 1
@@ -172,6 +175,9 @@ func handleOp8(c *Emulator, a byte, b byte) error {
 			c.V[0xF] = 0
 		}
 		c.V[x] = c.V[y] - c.V[x]
+	case 0xE:
+		c.V[0xF] = c.V[y] >> 7
+		c.V[x] = c.V[y] << 1
 	default:
 		return NoOpError{A: a, B: b}
 	}
