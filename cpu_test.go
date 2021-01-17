@@ -331,8 +331,6 @@ func TestOpMathCarry(t *testing.T) {
 }
 
 func TestOpLogic(t *testing.T) {
-	t.SkipNow()
-
 	rom := []byte{
 		0x60, 0x6E, // V0 = 110
 		0x61, 0x6E, // V1 = 110
@@ -341,6 +339,7 @@ func TestOpLogic(t *testing.T) {
 		0x80, 0x22, // V0 = V0 &  V2
 		0x81, 0x21, // V1 = V1 |  V2
 		0x82, 0x23, // V2 = V2 ^  V2
+		0x83, 0x13, // V3 = V3 ^  V1
 	}
 
 	c, err := runEmulator(rom)
@@ -348,7 +347,7 @@ func TestOpLogic(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	for i, v := range []byte{40, 126, 146, 170} {
+	for i, v := range []byte{40, 126, 0, 212} {
 		if c.V[i] != v {
 			t.Fatalf("expected register V%X to have value 0x%02X but found 0x%02X", i, v, c.V[i])
 		}

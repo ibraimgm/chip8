@@ -148,6 +148,12 @@ func handleOp8(c *Emulator, a byte, b byte) error {
 	switch n {
 	case 0:
 		c.V[x] = c.V[y]
+	case 1:
+		c.V[x] |= c.V[y]
+	case 2:
+		c.V[x] &= c.V[y]
+	case 3:
+		c.V[x] ^= c.V[y]
 	case 4:
 		v := uint16(c.V[x]) + uint16(c.V[y])
 		c.V[x] = byte(v & 0x00FF)
