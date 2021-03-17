@@ -39,10 +39,10 @@ var handlers = [16]func(*Emulator, byte, byte) error{
 	handleOp7,
 	handleOp8,
 	handleOp59,
-	nil,
+	handleOpA,
 	handleOpB,
 	nil,
-	nil,
+	handleOpD,
 	nil,
 	nil,
 }
@@ -185,6 +185,11 @@ func handleOp8(c *Emulator, a byte, b byte) error {
 	return nil
 }
 
+func handleOpA(c *Emulator, a byte, b byte) error {
+	c.I = (uint16(a&lsnMask) << 8) + uint16(b)
+	return nil
+}
+
 func handleOpB(c *Emulator, a byte, b byte) error {
 	addr := (uint16(a&lsnMask) << 8) + uint16(b) + uint16(c.V[0])
 	if int(addr) >= len(c.Memory) {
@@ -192,5 +197,67 @@ func handleOpB(c *Emulator, a byte, b byte) error {
 	}
 
 	c.PC = addr
+	return nil
+}
+
+func handleOpD(c *Emulator, a byte, b byte) error {
+	const maxX = 63
+	const maxY = 31
+	const maxVideo = (maxX+1)*(maxY+1)/8 - 1
+
+	x := c.V[a&lsnMask]
+	y := c.V[b&msnMask>>4]
+	n := b & lsnMask
+
+	// out of bounds or zero, just do nothing
+	if x > maxX || y > maxY || n == 0 {
+		return nil
+	}
+
+	// subslice the sprite data
+	c.V[0xF] = 0
+	sprites := c.Memory[int(c.I) : int(c.I)+int(n)]
+
+	// draw every byte, accounting for misaligned sprites
+	for _, sprite := range sprites {
+		// out of bounds: get out
+		if y > maxY {
+			break
+		}
+
+		// compute memory position and byte offset
+		pos := AddrVideo + x/8 + y*8
+		offset := x % 8 // 0 == aligned byte
+		y++
+
+		var before byte
+
+		// extract the whole byte
+		if offset == 0 {
+			before = c.Memory[pos]
+		} else {
+			s1, s2 := c.Memory[pos]<<offset, c.Memory[pos+1]>>(8-offset)
+			before = s1 | s2
+		}
+
+		// apply the sprite and update VF
+		after := before ^ sprite
+		if before&after != before {
+			c.V[0xF] = 1
+		}
+
+		// update memory
+		if offset == 0 {
+			c.Memory[pos] = after
+		} else {
+			s1, s2 := after>>offset, after<<(8-offset)
+			c.Memory[pos] = ((c.Memory[pos] >> (8 - offset)) << (8 - offset)) | s1
+
+			if pos <= AddrVideo+maxVideo {
+				c.Memory[pos+1] = ((c.Memory[pos+1] << offset) >> offset) | s2
+			}
+		}
+	}
+
 	return nil
 }

@@ -388,8 +388,6 @@ func TestOpShift(t *testing.T) {
 }
 
 func TestOpDraw(t *testing.T) {
-	t.SkipNow()
-
 	// a square in the first 3 screen rows, on top left
 	image := []byte{
 		0b11111111, 0b11111111, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000,
@@ -409,7 +407,7 @@ func TestOpDraw(t *testing.T) {
 		{name: "TopLeft", x: 0, y: 0, size: 2, video: map[uint16]byte{0: 0, 1: 0xFF, 8: 0, 9: 0xFF, 16: 0xFF, 17: 0xFF}, vf: 1},
 		{name: "TopRight", x: 56, y: 0, size: 2, video: map[uint16]byte{0: 0xFF, 1: 0xFF, 7: 0xFF, 8: 0xFF, 9: 0xFF, 15: 0xFF, 16: 0xFF, 17: 0xFF}, vf: 0},
 		{name: "BottomCenter", x: 24, y: 30, size: 2, video: map[uint16]byte{0: 0xFF, 1: 0xFF, 8: 0xFF, 9: 0xFF, 16: 0xFF, 17: 0xFF, 243: 0xFF, 251: 0xFF}, vf: 0},
-		{name: "Misaligned1", x: 44, y: 9, size: 2, video: map[uint16]byte{0: 0xFF, 1: 0xFF, 8: 0xFF, 9: 0xFF, 16: 0xFF, 17: 0xFF, 77: 0x1F, 78: 0xE0, 85: 0x1F, 86: 0xE0}, vf: 0},
+		{name: "Misaligned1", x: 44, y: 9, size: 2, video: map[uint16]byte{0: 0xFF, 1: 0xFF, 8: 0xFF, 9: 0xFF, 16: 0xFF, 17: 0xFF, 77: 0x0F, 78: 0xF0, 85: 0x0F, 86: 0xF0}, vf: 0},
 		{name: "Misaligned2", x: 4, y: 1, offset: 2, size: 2, video: map[uint16]byte{0: 0xFF, 1: 0xFF, 8: 0xF3, 9: 0xCF, 16: 0xF3, 17: 0xCF}, vf: 1},
 		{name: "OutOfBounds1", x: 60, y: 8, offset: 2, size: 2, video: map[uint16]byte{0: 0xFF, 1: 0xFF, 8: 0xFF, 9: 0xFF, 16: 0xFF, 17: 0xFF, 71: 0x0C, 79: 0x0C}, vf: 0},
 		{name: "OutOfBounds2", x: 250, y: 0, size: 2, video: map[uint16]byte{0: 0xFF, 1: 0xFF, 8: 0xFF, 9: 0xFF, 16: 0xFF, 17: 0xFF}, vf: 0},
