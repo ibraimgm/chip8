@@ -2,6 +2,7 @@ package chip8
 
 import (
 	"fmt"
+	"math/rand"
 )
 
 // masks to extract the most/least nibbles
@@ -41,7 +42,7 @@ var handlers = [16]func(*Emulator, byte, byte) error{
 	handleOp59,
 	handleOpA,
 	handleOpB,
-	nil,
+	handleOpC,
 	handleOpD,
 	nil,
 	nil,
@@ -197,6 +198,11 @@ func handleOpB(c *Emulator, a byte, b byte) error {
 	}
 
 	c.PC = addr
+	return nil
+}
+
+func handleOpC(c *Emulator, a byte, b byte) error {
+	c.V[a&lsnMask] = byte(rand.Intn(256)) & b
 	return nil
 }
 

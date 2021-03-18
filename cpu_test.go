@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"math/rand"
 	"testing"
 
 	"github.com/ibraimgm/chip8"
@@ -448,9 +449,8 @@ func TestOpDraw(t *testing.T) {
 }
 
 func TestOpRand(t *testing.T) {
-	t.SkipNow()
-
 	const registers = 16
+	rand.Seed(1) // make results consistent
 
 	tests := []struct {
 		name       string
