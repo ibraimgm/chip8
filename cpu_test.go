@@ -495,8 +495,6 @@ func TestOpRand(t *testing.T) {
 }
 
 func TestOpInputSkip(t *testing.T) {
-	t.SkipNow()
-
 	rom := []byte{
 		0x65, byte(chip8.KeyA), // V5 = 'A'
 		0x66, byte(chip8.KeyB), // V6 = 'B'
@@ -504,9 +502,9 @@ func TestOpInputSkip(t *testing.T) {
 		0x60, 0x01, // V0 = 1 (skipped)
 		0xE5, 0xA1, // SKP V5 (skips if 'A' is not pressed)
 		0x61, 0x01, // V1 = 1
-		0xE5, 0x9E, // SKP V6 (skips if 'B' is pressed)
+		0xE6, 0x9E, // SKP V6 (skips if 'B' is pressed)
 		0x62, 0x01, // V2 = 1
-		0xE5, 0xA1, // SKP V6 (skips if 'B' is not pressed)
+		0xE6, 0xA1, // SKP V6 (skips if 'B' is not pressed)
 		0x61, 0x01, // V3 = 1 (skipped)
 	}
 

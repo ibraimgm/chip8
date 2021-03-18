@@ -44,7 +44,7 @@ var handlers = [16]func(*Emulator, byte, byte) error{
 	handleOpB,
 	handleOpC,
 	handleOpD,
-	nil,
+	handleOpE,
 	nil,
 }
 
@@ -263,6 +263,32 @@ func handleOpD(c *Emulator, a byte, b byte) error {
 				c.Memory[pos+1] = ((c.Memory[pos+1] << offset) >> offset) | s2
 			}
 		}
+	}
+
+	return nil
+}
+
+func handleOpE(c *Emulator, a byte, b byte) error {
+	key := c.V[a&lsnMask]
+
+	if key > KeyF {
+		return nil // ignore invalid key
+	}
+
+	skip := false
+	switch b {
+	case 0x9E:
+		skip = c.keys[key]
+
+	case 0xA1:
+		skip = !c.keys[key]
+
+	default:
+		return NoOpError{A: a, B: b}
+	}
+
+	if skip {
+		c.PC += 2
 	}
 
 	return nil

@@ -49,17 +49,22 @@ type Emulator struct {
 	PC     uint16     // program counter
 	SP     int8       // stack pointer
 	Stack  [16]uint16 // the stack itself
+	keys   [16]bool   // pressed keys
 }
 
 // PressKey signal to the emulator that a given key is pressed.
 // the key will keep being counted as pressed until a call to
 // ReleaseKey. Pressing an already pressed key is a noop.
 func (e *Emulator) PressKey(key int) {
-
+	if key >= Key0 && key <= KeyF {
+		e.keys[key] = true
+	}
 }
 
 // ReleaseKey signal to the emulator that a given key is released.
 // Releasing an unpressed key is a noop.
 func (e *Emulator) ReleaseKey(key int) {
-
+	if key >= Key0 && key <= KeyF {
+		e.keys[key] = false
+	}
 }
