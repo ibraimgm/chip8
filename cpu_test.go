@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"math/rand"
 	"testing"
 
 	"github.com/ibraimgm/chip8"
@@ -175,8 +176,6 @@ func TestOpLdVx(t *testing.T) {
 }
 
 func TestOpJP(t *testing.T) {
-	t.SkipNow()
-
 	tests := []struct {
 		name  string
 		rom   []byte
@@ -184,8 +183,7 @@ func TestOpJP(t *testing.T) {
 		isErr bool
 	}{
 		{name: "JP", rom: []byte{0x60, 0x01, 0x12, 0x06, 0x61, 0x01, 0x62, 0x01}, vx: []byte{1, 0, 1}},
-		{name: "JP Error", rom: []byte{0x1F, 0xFF}, isErr: true},
-		{name: "JP+", rom: []byte{0x60, 0x04, 0xB2, 0x02, 0x61, 0x01, 0x61, 0x01}, vx: []byte{1, 0, 1}},
+		{name: "JP+", rom: []byte{0x60, 0x04, 0xB2, 0x02, 0x61, 0x01, 0x62, 0x01}, vx: []byte{4, 0, 1}},
 		{name: "JP+ Error", rom: []byte{0x60, 0xAA, 0xBF, 0xF0, 0x61, 0x01, 0x61, 0x01}, isErr: true},
 	}
 
@@ -221,8 +219,6 @@ func TestOpJP(t *testing.T) {
 }
 
 func TestOpCallRet(t *testing.T) {
-	t.SkipNow()
-
 	rom := []byte{
 		0x12, 0x08, // JP 0x208 (skip the next 3 lines)
 		0x61, 0x01, // V1 = 1
@@ -247,8 +243,6 @@ func TestOpCallRet(t *testing.T) {
 }
 
 func TestStackOverflow(t *testing.T) {
-	t.SkipNow()
-
 	_, err := runEmulator([]byte{0x22, 0x00}) // call self (inf. loop)
 	if !errors.Is(err, chip8.ErrStackOverflow) {
 		t.Fatalf("expected stack overflow error, but got %v", err)
@@ -256,8 +250,6 @@ func TestStackOverflow(t *testing.T) {
 }
 
 func TestOpSkips(t *testing.T) {
-	t.SkipNow()
-
 	rom := []byte{
 		0x60, 0x01, // V0 = 1
 		0x30, 0x01, // SE V0, 1
@@ -266,13 +258,13 @@ func TestOpSkips(t *testing.T) {
 		0x65, 0x05, // V5 = 5
 		0x40, 0x00, // SNE V0,0
 		0x62, 0x01, // V2 = 1 (skipped)
-		0x40, 0x00, // SNE V0,0
+		0x40, 0x01, // SNE V0,1
 		0x66, 0x05, // V6 = 5
 		0x50, 0x10, // SE V0, V1
-		0x67, 0x05, // V7 = 7
+		0x67, 0x07, // V7 = 7
 		0x55, 0x60, // SE V5, V6
 		0x63, 0x01, // V3 = 1
-		0x95, 0x60, // SNE V5,V6
+		0x95, 0x70, // SNE V5,V7
 		0x60, 0x03, // V0 = 3 (skipped)
 	}
 
@@ -289,8 +281,6 @@ func TestOpSkips(t *testing.T) {
 }
 
 func TestOpMath(t *testing.T) {
-	t.SkipNow()
-
 	rom := []byte{
 		0x60, 0x03, // V0 = 3
 		0x61, 0x04, // V1 = 4
@@ -300,7 +290,7 @@ func TestOpMath(t *testing.T) {
 		0x72, 0x05, // V2 = V2 + 5
 		0x83, 0x04, // V3 = V3 + V0
 		0x81, 0xA5, // V1 = V1 - VA
-		0x41, 0x00, // SNE V1,0
+		0x31, 0x00, // SE V1,0
 		0x12, 0x0A, // JP 0x20A
 	}
 
@@ -317,18 +307,16 @@ func TestOpMath(t *testing.T) {
 }
 
 func TestOpMathCarry(t *testing.T) {
-	t.SkipNow()
-
 	rom := []byte{
-		0x60, 0x05, // V0 = 5
-		0x61, 0x05, // V1 = 6
+		0x60, 0x04, // V0 = 4
+		0x61, 0x05, // V1 = 5
 		0x62, 0x0A, // V2 = 10
 		0x80, 0x25, // V0 = V0 - V2 (SUB)
-		0x4F, 0x00, // SNE VF,0
+		0x3F, 0x00, // SE VF,0
 		0x63, 0x01, // V3 = 1 (skipped)
 		0x81, 0x27, // V1 = V2 - V1 (SUBN)
-		0x4F, 0x00, // SNE VF,1
-		0x63, 0x01, // V4 = 1 (skipped)
+		0x4F, 0x00, // SNE VF,0
+		0x64, 0x01, // V4 = 1 (skipped)
 	}
 
 	c, err := runEmulator(rom)
@@ -336,7 +324,7 @@ func TestOpMathCarry(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	for i, v := range []byte{250, 4, 10, 0, 0} {
+	for i, v := range []byte{250, 5, 10, 0, 0} {
 		if c.V[i] != v {
 			t.Fatalf("expected register V%X to have value 0x%02X but found 0x%02X", i, v, c.V[i])
 		}
@@ -344,8 +332,6 @@ func TestOpMathCarry(t *testing.T) {
 }
 
 func TestOpLogic(t *testing.T) {
-	t.SkipNow()
-
 	rom := []byte{
 		0x60, 0x6E, // V0 = 110
 		0x61, 0x6E, // V1 = 110
@@ -354,6 +340,7 @@ func TestOpLogic(t *testing.T) {
 		0x80, 0x22, // V0 = V0 &  V2
 		0x81, 0x21, // V1 = V1 |  V2
 		0x82, 0x23, // V2 = V2 ^  V2
+		0x83, 0x13, // V3 = V3 ^  V1
 	}
 
 	c, err := runEmulator(rom)
@@ -361,7 +348,7 @@ func TestOpLogic(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	for i, v := range []byte{40, 126, 146, 170} {
+	for i, v := range []byte{40, 126, 0, 212} {
 		if c.V[i] != v {
 			t.Fatalf("expected register V%X to have value 0x%02X but found 0x%02X", i, v, c.V[i])
 		}
@@ -369,8 +356,6 @@ func TestOpLogic(t *testing.T) {
 }
 
 func TestOpShift(t *testing.T) {
-	t.SkipNow()
-
 	tests := []struct {
 		name string
 		rom  []byte
@@ -404,8 +389,6 @@ func TestOpShift(t *testing.T) {
 }
 
 func TestOpDraw(t *testing.T) {
-	t.SkipNow()
-
 	// a square in the first 3 screen rows, on top left
 	image := []byte{
 		0b11111111, 0b11111111, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000,
@@ -425,7 +408,7 @@ func TestOpDraw(t *testing.T) {
 		{name: "TopLeft", x: 0, y: 0, size: 2, video: map[uint16]byte{0: 0, 1: 0xFF, 8: 0, 9: 0xFF, 16: 0xFF, 17: 0xFF}, vf: 1},
 		{name: "TopRight", x: 56, y: 0, size: 2, video: map[uint16]byte{0: 0xFF, 1: 0xFF, 7: 0xFF, 8: 0xFF, 9: 0xFF, 15: 0xFF, 16: 0xFF, 17: 0xFF}, vf: 0},
 		{name: "BottomCenter", x: 24, y: 30, size: 2, video: map[uint16]byte{0: 0xFF, 1: 0xFF, 8: 0xFF, 9: 0xFF, 16: 0xFF, 17: 0xFF, 243: 0xFF, 251: 0xFF}, vf: 0},
-		{name: "Misaligned1", x: 44, y: 9, size: 2, video: map[uint16]byte{0: 0xFF, 1: 0xFF, 8: 0xFF, 9: 0xFF, 16: 0xFF, 17: 0xFF, 77: 0x1F, 78: 0xE0, 85: 0x1F, 86: 0xE0}, vf: 0},
+		{name: "Misaligned1", x: 44, y: 9, size: 2, video: map[uint16]byte{0: 0xFF, 1: 0xFF, 8: 0xFF, 9: 0xFF, 16: 0xFF, 17: 0xFF, 77: 0x0F, 78: 0xF0, 85: 0x0F, 86: 0xF0}, vf: 0},
 		{name: "Misaligned2", x: 4, y: 1, offset: 2, size: 2, video: map[uint16]byte{0: 0xFF, 1: 0xFF, 8: 0xF3, 9: 0xCF, 16: 0xF3, 17: 0xCF}, vf: 1},
 		{name: "OutOfBounds1", x: 60, y: 8, offset: 2, size: 2, video: map[uint16]byte{0: 0xFF, 1: 0xFF, 8: 0xFF, 9: 0xFF, 16: 0xFF, 17: 0xFF, 71: 0x0C, 79: 0x0C}, vf: 0},
 		{name: "OutOfBounds2", x: 250, y: 0, size: 2, video: map[uint16]byte{0: 0xFF, 1: 0xFF, 8: 0xFF, 9: 0xFF, 16: 0xFF, 17: 0xFF}, vf: 0},
@@ -466,9 +449,8 @@ func TestOpDraw(t *testing.T) {
 }
 
 func TestOpRand(t *testing.T) {
-	t.SkipNow()
-
 	const registers = 16
+	rand.Seed(1) // make results consistent
 
 	tests := []struct {
 		name       string
@@ -513,8 +495,6 @@ func TestOpRand(t *testing.T) {
 }
 
 func TestOpInputSkip(t *testing.T) {
-	t.SkipNow()
-
 	rom := []byte{
 		0x65, byte(chip8.KeyA), // V5 = 'A'
 		0x66, byte(chip8.KeyB), // V6 = 'B'
@@ -522,9 +502,9 @@ func TestOpInputSkip(t *testing.T) {
 		0x60, 0x01, // V0 = 1 (skipped)
 		0xE5, 0xA1, // SKP V5 (skips if 'A' is not pressed)
 		0x61, 0x01, // V1 = 1
-		0xE5, 0x9E, // SKP V6 (skips if 'B' is pressed)
+		0xE6, 0x9E, // SKP V6 (skips if 'B' is pressed)
 		0x62, 0x01, // V2 = 1
-		0xE5, 0xA1, // SKP V6 (skips if 'B' is not pressed)
+		0xE6, 0xA1, // SKP V6 (skips if 'B' is not pressed)
 		0x61, 0x01, // V3 = 1 (skipped)
 	}
 
